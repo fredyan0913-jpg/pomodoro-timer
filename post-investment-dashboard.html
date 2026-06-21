@@ -322,26 +322,32 @@ body{font-family:var(--font-sans);font-size:var(--fs-base);color:var(--text-prim
       <div class="panel"><div class="panel-header"><h3 class="panel-title">🎯 五维风险雷达图</h3><select id="riskRadarCompanySelect" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"></select></div><div class="panel-body"><div class="panel-chart"><canvas id="chartRiskRadar"></canvas></div></div></div>
       <div class="panel"><div class="panel-header"><h3 class="panel-title">🚦 风险概览</h3><span class="panel-badge badge-red" id="riskTableBadge">--</span></div><div class="panel-body" style="display:flex;gap:var(--s6);align-items:center"><div class="panel-chart" style="flex:1;max-width:180px"><canvas id="chartTrafficLightRisk"></canvas></div><div style="flex:1;font-size:var(--fs-sm)" id="riskSummaryText"></div></div></div>
     </div>
-    <!-- Row 2: 五维风险热力图 -->
+    <!-- Row 2: 五维风险热力图 (评分由下方风险因子计算) -->
     <div class="section-row full">
-      <div class="panel"><div class="panel-header"><h3 class="panel-title">🔥 五维风险评分矩阵 (0-100，分数越低风险越高)</h3></div><div class="panel-body" style="padding:0"><div class="table-wrap" style="max-height:500px"><table class="table-data" id="riskDimensionTable"><thead><tr>
+      <div class="panel"><div class="panel-header"><h3 class="panel-title">🔥 五维风险评分矩阵</h3><span style="font-size:var(--fs-xs);color:var(--text-muted)">每格显示 得分(活跃因子数) — 评分由下方风险因子计算得出 ↓</span></div><div class="panel-body" style="padding:0"><div class="table-wrap" style="max-height:500px"><table class="table-data" id="riskDimensionTable"><thead><tr>
         <th>公司</th><th style="color:var(--red)">外部风险</th><th style="color:var(--amber)">运营风险</th><th style="color:var(--blue)">财务风险</th><th style="color:var(--purple)">战略风险</th><th style="color:var(--teal)">治理风险</th><th>综合评分</th><th>风险灯</th>
       </tr></thead><tbody></tbody></table></div></div></div>
     </div>
-    <!-- Row 3: 活跃风险因子清单 -->
+    <!-- Row 3: 风险因子清单 (可筛选) -->
     <div class="section-row full">
-      <div class="panel"><div class="panel-header"><h3 class="panel-title">🔍 活跃风险因子</h3><span class="panel-badge badge-red" id="riskFactorBadge">--</span></div><div class="panel-body" style="padding:0"><div class="table-wrap" style="max-height:350px"><table class="table-data" id="riskFactorTable"><thead><tr>
+      <div class="panel"><div class="panel-header"><h3 class="panel-title">🔍 风险因子清单（评分来源）</h3><span class="panel-badge badge-red" id="riskFactorBadge">--</span></div>
+      <!-- 筛选栏 -->
+      <div style="padding:var(--s2) var(--s4);display:flex;gap:var(--s3);align-items:center;background:var(--bg-card);border-bottom:1px solid var(--border-subtle);flex-wrap:wrap">
+        <span style="font-size:var(--fs-xs);color:var(--text-muted)">筛选:</span>
+        <select id="filterCompany" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"><option value="all">全部公司</option></select>
+        <select id="filterDimension" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"><option value="all">全部维度</option><option value="外部风险">外部风险</option><option value="运营风险">运营风险</option><option value="财务风险">财务风险</option><option value="战略风险">战略风险</option><option value="治理风险">治理风险</option></select>
+        <select id="filterSeverity" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"><option value="all">全部等级</option><option value="high">🔴 高</option><option value="medium">🟡 中</option><option value="low">🟢 低</option></select>
+        <select id="filterStatus" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"><option value="all">全部状态</option><option value="active">进行中</option><option value="monitoring">监控中</option><option value="mitigated">已缓解</option></select>
+        <span id="filterCount" style="font-size:var(--fs-xs);color:var(--text-muted);margin-left:auto"></span>
+      </div>
+      <div class="panel-body" style="padding:0"><div class="table-wrap" style="max-height:350px"><table class="table-data" id="riskFactorTable"><thead><tr>
         <th>公司</th><th>风险维度</th><th>子类别</th><th>严重程度</th><th>风险描述</th><th>状态</th><th>责任人</th><th>截止日</th>
       </tr></thead><tbody></tbody></table></div></div></div>
     </div>
-    <!-- Row 4: 领先信号 + 现金跑道 -->
-    <div class="section-row">
-      <div class="panel"><div class="panel-header"><h3 class="panel-title">📡 领先信号雷达</h3><select id="radarCompanySelect" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"></select></div><div class="panel-body"><div class="panel-chart"><canvas id="chartRadar"></canvas></div></div></div>
-      <div class="panel"><div class="panel-header"><h3 class="panel-title">💸 现金跑道对比</h3></div><div class="panel-body"><div class="panel-chart"><canvas id="chartCashRunway"></canvas></div></div></div>
-    </div>
-    <!-- Row 5: 季度消耗 -->
+    <!-- Row 4: 五大风险画像卡片 -->
     <div class="section-row full">
-      <div class="panel"><div class="panel-header"><h3 class="panel-title">📉 季度消耗趋势 + 13周预测</h3><select id="burnCompanySelect" style="background:var(--bg-input);border:1px solid var(--border-divider);color:var(--text-primary);padding:2px var(--s2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-family:var(--font-sans)"></select></div><div class="panel-body"><div class="panel-chart"><canvas id="chartBurn"></canvas></div></div></div>
+      <div class="panel"><div class="panel-header"><h3 class="panel-title">🖼 五大风险画像 — 各公司维度指标明细</h3><span style="font-size:var(--fs-xs);color:var(--text-muted)">分数 = 100 − 风险扣分 | 子项列出来源风险因子</span></div>
+      <div class="panel-body" id="riskProfiles" style="display:flex;flex-direction:column;gap:var(--s4)"></div></div>
     </div>
   </section>
 
@@ -454,7 +460,7 @@ const charts={};
 // ============================================================
 // DATA FACTORY — 15 Chinese A-share listed companies, CVC context
 // ============================================================
-const PARENT_BUS = ['消费者业务','企业业务','云计算','智能汽车','数字能源','半导体','工业互联网','医疗科技'];
+const PARENT_BUS = ['消费无人机','行业应用','农业植保','手持影像','车载智驾','教育机器人','测绘GIS','能源安防'];
 const SECTORS = ['新能源','半导体','医疗器械','人工智能','电子制造','CXO医药','光伏新能源','企业SaaS','芯片设计','企业软件','CIS芯片','医疗服务','工业软件','智能汽车软件','新能源电池'];
 const STAGES = ['A轮','B轮','C轮','C+轮','D轮','Pre-IPO'];
 
@@ -464,42 +470,93 @@ function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
 function pickN(arr,n){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
 
 function generateMockData(){
-  // 15 Chinese A-share listed companies — CVC invested pre-IPO, now public
-  // Parent: 华为 CVC | Unit: 万元 RMB | Stage = investment stage, not current status
+  // 15 Chinese A-share listed companies — DJI CVC context, real public metrics
+  // Unit: 万元 RMB | Stage = investment round at entry
   const base=[
-    {name:'宁德时代',    ticker:'300750.SZ',sector:'新能源',       stage:'B轮', invDate:'2018-06',invAmt:50000, val:900000, own:5.5,  moic:18.0,irr:95},
-    {name:'中芯国际',    ticker:'688981.SH',sector:'半导体',       stage:'D轮', invDate:'2020-07',invAmt:80000, val:520000, own:3.2,  moic:6.5, irr:52},
-    {name:'迈瑞医疗',    ticker:'300760.SZ',sector:'医疗器械',     stage:'C轮', invDate:'2018-10',invAmt:60000, val:680000, own:4.8,  moic:11.3,irr:68},
-    {name:'海康威视',    ticker:'002415.SZ',sector:'人工智能',     stage:'D轮', invDate:'2017-03',invAmt:45000, val:550000, own:3.8,  moic:12.2,irr:58},
-    {name:'比亚迪电子',  ticker:'002594.SZ',sector:'电子制造',     stage:'B轮', invDate:'2016-09',invAmt:35000, val:480000, own:4.2,  moic:13.7,irr:62},
-    {name:'科大讯飞',    ticker:'002230.SZ',sector:'人工智能',     stage:'C轮', invDate:'2019-05',invAmt:30000, val:380000, own:6.0,  moic:12.7,irr:72},
-    {name:'隆基绿能',    ticker:'601012.SH',sector:'光伏新能源',   stage:'B轮', invDate:'2018-01',invAmt:40000, val:620000, own:5.0,  moic:15.5,irr:78},
-    {name:'药明康德',    ticker:'603259.SH',sector:'CXO医药',      stage:'C轮', invDate:'2018-12',invAmt:55000, val:720000, own:4.5,  moic:13.1,irr:65},
-    {name:'金山办公',    ticker:'688111.SH',sector:'企业SaaS',     stage:'Pre-IPO',invDate:'2020-01',invAmt:25000,val:350000,own:5.5,moic:14.0,irr:88},
-    {name:'汇顶科技',    ticker:'603160.SH',sector:'芯片设计',     stage:'C轮', invDate:'2019-08',invAmt:28000, val:220000, own:7.0,  moic:7.9, irr:45},
-    {name:'用友网络',    ticker:'600588.SH',sector:'企业软件',     stage:'Pre-IPO',invDate:'2018-04',invAmt:32000,val:420000,own:4.0,moic:13.1,irr:60},
-    {name:'韦尔股份',    ticker:'603501.SH',sector:'CIS芯片',      stage:'C轮', invDate:'2020-03',invAmt:45000, val:580000, own:5.2,  moic:12.9,irr:71},
-    {name:'爱尔眼科',    ticker:'300015.SZ',sector:'医疗服务',     stage:'C轮', invDate:'2017-11',invAmt:28000, val:390000, own:5.8,  moic:13.9,irr:75},
-    {name:'宝信软件',    ticker:'600845.SH',sector:'工业软件',     stage:'B轮', invDate:'2019-02',invAmt:22000, val:280000, own:6.5,  moic:12.7,irr:82},
-    {name:'中科创达',    ticker:'300496.SZ',sector:'智能汽车软件', stage:'B轮', invDate:'2019-11',invAmt:18000, val:260000, own:7.2,  moic:14.4,irr:92},
+    {name:'宁德时代',    ticker:'300750.SZ',sector:'新能源',       stage:'B轮', invDate:'2018-06',invAmt:50000, val:900000, own:5.5,  moic:18.0,irr:95, realRev:36200000, realNP:5070000, rdPct:5.1, pos:'动力电池全球#1(37.9%)'},
+    {name:'中芯国际',    ticker:'688981.SH',sector:'半导体',       stage:'D轮', invDate:'2020-07',invAmt:80000, val:520000, own:3.2,  moic:6.5, irr:52, realRev:5780000, realNP:370000, rdPct:9.4, pos:'纯晶圆代工全球#2'},
+    {name:'迈瑞医疗',    ticker:'300760.SZ',sector:'医疗器械',     stage:'C轮', invDate:'2018-10',invAmt:60000, val:680000, own:4.8,  moic:11.3,irr:68, realRev:3670000, realNP:1170000, rdPct:10.9, pos:'中国#1医疗器械'},
+    {name:'海康威视',    ticker:'002415.SZ',sector:'人工智能',     stage:'D轮', invDate:'2017-03',invAmt:45000, val:550000, own:3.8,  moic:12.2,irr:58, realRev:9250000, realNP:1200000, rdPct:10.0, pos:'全球#1视频安防'},
+    {name:'比亚迪电子',  ticker:'002594.SZ',sector:'电子制造',     stage:'B轮', invDate:'2016-09',invAmt:35000, val:480000, own:4.2,  moic:13.7,irr:62, realRev:77710000, realNP:4030000, rdPct:5.5, pos:'中国#1新能源车'},
+    {name:'科大讯飞',    ticker:'002230.SZ',sector:'人工智能',     stage:'C轮', invDate:'2019-05',invAmt:30000, val:380000, own:6.0,  moic:12.7,irr:72, realRev:2330000, realNP:56000, rdPct:19.6, pos:'中国AI语音#1'},
+    {name:'隆基绿能',    ticker:'601012.SH',sector:'光伏新能源',   stage:'B轮', invDate:'2018-01',invAmt:40000, val:620000, own:5.0,  moic:15.5,irr:78, realRev:8260000, realNP:-860000, rdPct:6.0, pos:'单晶硅片全球#1'},
+    {name:'药明康德',    ticker:'603259.SH',sector:'CXO医药',      stage:'C轮', invDate:'2018-12',invAmt:55000, val:720000, own:4.5,  moic:13.1,irr:65, realRev:3920000, realNP:945000, rdPct:0, pos:'CRDMO全球领先'},
+    {name:'金山办公',    ticker:'688111.SH',sector:'企业SaaS',     stage:'Pre-IPO',invDate:'2020-01',invAmt:25000,val:350000,own:5.5,moic:14.0,irr:88, realRev:512000, realNP:165000, rdPct:33.1, pos:'中国办公软件#1(632M MAU)'},
+    {name:'汇顶科技',    ticker:'603160.SH',sector:'芯片设计',     stage:'C轮', invDate:'2019-08',invAmt:28000, val:220000, own:7.0,  moic:7.9, irr:45, realRev:438000, realNP:60400, rdPct:21.7, pos:'指纹传感器中国#1'},
+    {name:'用友网络',    ticker:'600588.SH',sector:'企业软件',     stage:'Pre-IPO',invDate:'2018-04',invAmt:32000,val:420000,own:4.0,moic:13.1,irr:60, realRev:915000, realNP:-206000, rdPct:30.1, pos:'中国ERP#1(387家Top500)'},
+    {name:'韦尔股份',    ticker:'603501.SH',sector:'CIS芯片',      stage:'C轮', invDate:'2020-03',invAmt:45000, val:580000, own:5.2,  moic:12.9,irr:71, realRev:2570000, realNP:332000, rdPct:15.0, pos:'车载CIS全球#1(32.9%)'},
+    {name:'爱尔眼科',    ticker:'300015.SZ',sector:'医疗服务',     stage:'C轮', invDate:'2017-11',invAmt:28000, val:390000, own:5.8,  moic:13.9,irr:75, realRev:2100000, realNP:356000, rdPct:1.5, pos:'中国眼科连锁#1(352家)'},
+    {name:'宝信软件',    ticker:'600845.SH',sector:'工业软件',     stage:'B轮', invDate:'2019-02',invAmt:22000, val:280000, own:6.5,  moic:12.7,irr:82, realRev:1360000, realNP:227000, rdPct:10.7, pos:'中国工业软件#1'},
+    {name:'中科创达',    ticker:'300496.SZ',sector:'智能汽车软件', stage:'B轮', invDate:'2019-11',invAmt:18000, val:260000, own:7.2,  moic:14.4,irr:92, realRev:539000, realNP:40700, rdPct:29.8, pos:'中国车载OS#1'},
   ];
 
   return base.map((b,i)=>{
-    // ═══ 五维风险评估模型 ═══
-    // Each dimension scored 0-100 (lower = riskier)
-    const riskDimensions = {
-      // (1) 外部风险: 政治环境 / 行业变化 / 友商竞争 / 法律法规 / 贸易政策
-      external: rand(55,95),
-      // (2) 运营风险: 质量管理 / 团队稳定性 / 供应链风险 / 技术产品
-      operational: rand(50,95),
-      // (3) 财务风险: 资金流动性 / 运营效率 / 财务结构 / 造血能力
-      financial: rand(45,95),
-      // (4) 战略风险: 业务组合策略 / 技术变革 / 战略转型 / 市场分析
-      strategic: rand(50,95),
-      // (5) 治理风险: 治理结构 / 关键股东控制 / 关联交易 / 内控合规
-      governance: rand(55,98)
+    // ═══ 五维风险评估模型 — 由风险因子驱动评分 ═══
+    // 每个维度基础分 95，活跃因子按严重度扣分：高-25 / 中-15 / 低-5
+    // 生成全部风险因子（决定各维度得分）
+    const riskFactors = [];
+    const addFactor = (dim, sub, sev, desc) => {
+      riskFactors.push({
+        dimension:dim, subCategory:sub, severity:sev, description:desc,
+        status: sev==='high'?'active':Math.random()>0.4?'monitoring':'mitigated',
+        owner:pick(['张总','李总','王总','赵总']),
+        deadline:`2026-${String(rand(8,12)).padStart(2,'0')}-${String(rand(1,28)).padStart(2,'0')}`
+      });
     };
-    // Weighted composite risk score
+
+    // 为每个公司生成覆盖5个维度的风险因子（约3-7个活跃因子，2-4个监控/已缓解因子）
+    // 外部风险因子
+    const extSev = Math.random()<0.3?'high':Math.random()<0.5?'medium':'low';
+    addFactor('外部风险','行业变化',extSev,'赛道竞争格局恶化，头部企业市占率加速集中');
+    if(Math.random()<0.6) addFactor('外部风险','贸易政策',Math.random()<0.4?'high':'medium','中美科技博弈升级，关键设备/材料进口受限风险');
+    if(Math.random()<0.5) addFactor('外部风险','法律法规',Math.random()<0.5?'medium':'low','行业监管政策趋严，合规成本上升');
+    if(Math.random()<0.4) addFactor('外部风险','友商竞争',Math.random()<0.5?'medium':'low','竞品定价策略调整，价格战压力增大');
+    if(Math.random()<0.3) addFactor('外部风险','政治环境','medium','地缘政治风险影响海外业务拓展');
+
+    // 运营风险因子
+    addFactor('运营风险','供应链','medium','核心零部件供应依赖单一来源，供应链韧性不足');
+    if(Math.random()<0.6) addFactor('运营风险','技术产品',Math.random()<0.5?'high':'medium','产品迭代速度落后于行业领先者，技术差距扩大');
+    if(Math.random()<0.5) addFactor('运营风险','质量管理','medium','质量问题导致客户投诉率上升，品牌声誉受损');
+    if(Math.random()<0.4) addFactor('运营风险','团队建设',Math.random()<0.4?'high':'medium','核心研发团队存在流失风险');
+
+    // 财务风险因子
+    const finSev = Math.random()<0.35?'high':Math.random()<0.5?'medium':'low';
+    addFactor('财务风险','资金流动性',finSev,'现金储备不足，短期偿债压力增大');
+    if(Math.random()<0.6) addFactor('财务风险','运营效率',Math.random()<0.5?'high':'medium','应收账款周转天数恶化，经营现金流为负');
+    if(Math.random()<0.5) addFactor('财务风险','造血能力','medium','主营业务盈利能力下滑，依赖外部融资维持运营');
+    if(Math.random()<0.4) addFactor('财务风险','财务结构','low','资产负债率偏高，债务结构需优化');
+
+    // 战略风险因子
+    if(Math.random()<0.5) addFactor('战略风险','技术变革','medium','AI/大模型等新技术可能颠覆现有产品体系');
+    if(Math.random()<0.5) addFactor('战略风险','市场分析','medium','新市场拓展不及预期，国际化战略受阻');
+    if(Math.random()<0.4) addFactor('战略风险','战略转型',Math.random()<0.5?'high':'medium','传统业务增长乏力，战略转型方向尚不清晰');
+    if(Math.random()<0.3) addFactor('战略风险','业务组合',Math.random()<0.5?'medium':'low','投资组合过于集中，缺乏多元化对冲');
+
+    // 治理风险因子
+    if(Math.random()<0.5) addFactor('治理风险','内控合规','medium','内部审计发现控制缺陷，整改尚未完成');
+    if(Math.random()<0.4) addFactor('治理风险','关联交易',Math.random()<0.5?'high':'medium','大股东关联交易金额增长过快，存在利益输送隐患');
+    if(Math.random()<0.3) addFactor('治理风险','治理结构','low','董事会专业委员会运作机制有待完善');
+    if(Math.random()<0.3) addFactor('治理风险','关键股东控制','medium','单一股东决策权过度集中');
+
+    // ===== 从风险因子计算五维评分 =====
+    const calcDimScore = (dim) => {
+      const factors = riskFactors.filter(f => f.dimension === dim);
+      let score = 95;
+      factors.forEach(f => {
+        if      (f.severity === 'high')   score -= (f.status === 'active' ? 25 : 10);
+        else if (f.severity === 'medium') score -= (f.status === 'active' ? 15 : 5);
+        else                              score -= (f.status === 'active' ? 5 : 2);
+      });
+      return Math.max(10, score);
+    };
+    const riskDimensions = {
+      external: calcDimScore('外部风险'),
+      operational: calcDimScore('运营风险'),
+      financial: calcDimScore('财务风险'),
+      strategic: calcDimScore('战略风险'),
+      governance: calcDimScore('治理风险')
+    };
+    // 综合风险评分（加权）
     const riskScore = Math.round(
       riskDimensions.external * 0.15 +
       riskDimensions.operational * 0.20 +
@@ -509,42 +566,26 @@ function generateMockData(){
     );
     const riskLevel = riskScore >= 75 ? 'low' : riskScore >= 60 ? 'medium' : 'high';
 
-    // Generate specific risk factors based on dimension scores
-    const riskFactors = [];
-    const addFactor = (dim, sub, sev, desc) => riskFactors.push({dimension:dim, subCategory:sub, severity:sev, description:desc, status:sev==='high'?'active':Math.random()>0.4?'monitoring':'mitigated', owner:pick(['张总','李总','王总','赵总']), deadline:`2026-${String(rand(8,12)).padStart(2,'0')}-${String(rand(1,28)).padStart(2,'0')}`});
-
-    if (riskDimensions.external < 65) {
-      addFactor('外部风险','行业变化','high','赛道竞争格局恶化，头部企业市占率加速集中');
-      addFactor('外部风险','贸易政策','medium','中美科技博弈升级，关键设备/材料进口受限风险');
-      if (riskDimensions.external < 55) addFactor('外部风险','法律法规','high','行业监管政策趋严，合规成本上升');
-    }
-    if (riskDimensions.operational < 65) {
-      addFactor('运营风险','供应链','high','核心零部件供应依赖单一来源，供应链韧性不足');
-      addFactor('运营风险','技术产品','medium','产品迭代速度落后于行业领先者，技术差距扩大');
-      if (riskDimensions.operational < 55) addFactor('运营风险','质量管理','high','质量问题导致客户投诉率上升，品牌声誉受损');
-    }
-    if (riskDimensions.financial < 65) {
-      addFactor('财务风险','资金流动性','high','现金储备不足6个月运营，短期偿债压力大');
-      addFactor('财务风险','运营效率','medium','应收账款周转天数恶化，经营现金流为负');
-      if (riskDimensions.financial < 55) addFactor('财务风险','造血能力','high','主营业务持续亏损，依赖外部融资维持运营');
-    }
-    if (riskDimensions.strategic < 65) {
-      addFactor('战略风险','技术变革','medium','AI/大模型等新技术可能颠覆现有产品体系');
-      addFactor('战略风险','市场分析','medium','新市场拓展不及预期，国际化战略受阻');
-    }
-    if (riskDimensions.governance < 65) {
-      addFactor('治理风险','内控合规','medium','内部审计发现控制缺陷，整改尚未完成');
-      if (riskDimensions.governance < 55) addFactor('治理风险','关联交易','high','大股东关联交易金额增长过快，存在利益输送隐患');
-    }
-    // Always add some monitoring items for completeness
-    if (riskFactors.length < 3) {
-      if (riskDimensions.external >= 75) addFactor('外部风险','友商竞争','low','密切跟踪竞品定价策略与新品发布节奏');
-      if (riskDimensions.operational >= 75) addFactor('运营风险','团队建设','low','核心研发团队保持稳定，员工满意度良好');
-    }
-
     const govScore = riskDimensions.governance;
-    const revGrowth=randF(-5,35), cashRun=12+rand(1,36), profitM=randF(5,35);
+    const realRevenue=b.realRev/10000; // 万元→万元(already)
+    const revGrowth=randF(-5,35), cashRun=12+rand(1,36), profitM=b.realNP/b.realRev*100;
     const burnRate=rand(30,300), arr=rand(3000,20000);
+
+    // DJI-specific BU engagement mapping
+    const djiBUSynergy = {
+      '新能源': ['车载智驾','能源安防'], '半导体': ['行业应用','消费无人机'],
+      '医疗器械': ['行业应用'], '人工智能': ['行业应用','测绘GIS','车载智驾'],
+      '电子制造': ['消费无人机','手持影像','车载智驾'], 'CXO医药': ['行业应用'],
+      '光伏新能源': ['能源安防','测绘GIS'], '企业SaaS': ['行业应用','教育机器人'],
+      '芯片设计': ['消费无人机','行业应用','手持影像'], '企业软件': ['行业应用','测绘GIS'],
+      'CIS芯片': ['消费无人机','行业应用','车载智驾'], '医疗服务': ['行业应用'],
+      '工业软件': ['行业应用','能源安防'], '智能汽车软件': ['车载智驾','行业应用'],
+    };
+    const mappedBUs = djiBUSynergy[b.sector] || pickN(PARENT_BUS,3);
+    const buCount=mappedBUs.length+Math.floor(Math.random()*2);
+    const bus=[...mappedBUs,...pickN(PARENT_BUS.filter(b=>!mappedBUs.includes(b)),Math.max(0,buCount-mappedBUs.length))];
+    const buEngagements=bus.map(bu=>({buName:bu,level:rand(1,5),pocCount:rand(0,3),jdaCount:rand(0,2),contractValue:rand(0,500)}));
+    const engageScore = Math.round(buEngagements.reduce((s,e)=>s+e.level*20+e.pocCount*5+e.jdaCount*10,0)/buEngagements.length);
 
     // ═══ 二维分级矩阵: 商业成熟度 × 战略重要性 ═══
     // 商业成熟度 (5 sub-dimensions): 创始人及团队 / 战略及商业逻辑 / 价值创造 / 管理运营 / 资本运营
@@ -587,12 +628,6 @@ function generateMockData(){
     const exitStages=['未启动','准备中','谈判中','已签约','已退出'];
     const exitTypes=['IPO','并购','转让','回购','已上市'];
 
-    // BU engagements
-    const buCount=2+Math.floor(Math.random()*5);
-    const bus=pickN(PARENT_BUS,buCount);
-    const buEngagements=bus.map(bu=>({buName:bu,level:rand(1,5),pocCount:rand(0,3),jdaCount:rand(0,2),contractValue:rand(0,500)}));
-    const engageScore = Math.round(buEngagements.reduce((s,e)=>s+e.level*20+e.pocCount*5+e.jdaCount*10,0)/buEngagements.length);
-
     // Leading indicators
     const hiringV=rand(2,25), hiringCh=randF(-30,60);
     const execCh=rand(0,3), execRecent=Math.random()>0.7;
@@ -634,8 +669,9 @@ function generateMockData(){
       id:`p${String(i+1).padStart(2,'0')}`,name:b.name,sector:b.sector,stage:b.stage,ticker:b.ticker,
       vintageYear:parseInt(b.invDate.slice(0,4)),investedDate:b.invDate,
       investAmount:b.invAmt,valuation:b.val,ownership:b.own,moic:b.moic,irr:b.irr,
-      // Financial — A股规模
-      revenue:randF(8000,350000),revenueGrowth:revGrowth,grossMargin:randF(22,62),
+      // Financial — 基于公开财报数据
+      revenue:b.realRev/10000,realRevenue:b.realRev/10000,realNetProfit:b.realNP/10000,rdPct:b.rdPct,marketPosition:b.pos,
+      revenueGrowth:revGrowth,grossMargin:randF(22,62),
       ebitda:randF(2000,120000),profitMargin:profitM,burnRate,cashRunway:cashRun,
       quarterlyBurn:[rand(80,500),rand(80,500),rand(80,500),rand(80,500)],
       thirteenWeekForecast:rand(400,2000),arr,customerCount:rand(500,50000),
@@ -652,8 +688,8 @@ function generateMockData(){
       businessMaturity,maturitySubs,strategicImportance,importanceSubs,
       abcdeGrade,abcdeScore,abcdeRationale:quadrantLabels[quadrant]+' · 成熟度'+businessMaturity+'/重要度'+strategicImportance,
       abcdeExitStrategy,
-      // Strategic — Huawei CVC
-      parentBU:pick(PARENT_BUS),buEngagements,engagementHeatmapScore:engageScore,
+      // Strategic — DJI CVC, mapped by sector
+      parentBU:mappedBUs[0],buEngagements,engagementHeatmapScore:engageScore,
       commercialImpact:{pocCount:buEngagements.reduce((s,e)=>s+e.pocCount,0),jdaCount:buEngagements.reduce((s,e)=>s+e.jdaCount,0),activeContracts:rand(1,5),contractValue:rand(200,5000),pipelineValue:rand(500,8000)},
       deploymentValue:{costSavings:rand(100,2000),revenueGenerated:rand(200,3000),efficiencyGain:randF(5,30)},
       strategicInsightsCount:rand(3,15),strategicAlignmentScore:rand(55,98),
@@ -892,55 +928,117 @@ function renderRiskMonitoring(){
     <div style="margin-top:var(--s2)"><b>最薄弱维度:</b> <span style="color:var(--amber)">${dimNames[worstDim[0]]}</span> (均值 ${Math.round(worstDim[1])})</div>
     <div style="margin-top:var(--s4);font-size:var(--fs-xs);color:var(--text-muted)">五维模型: 外部(15%) · 运营(20%) · <br>财务(30%) · 战略(15%) · 治理(20%)</div>`;
 
-  // --- Risk Dimension Table (Heatmap) ---
+  // --- Risk Dimension Table (Heatmap) — show score + active factor count ---
   const dimColors={external:'var(--red)',operational:'var(--amber)',financial:'var(--blue)',strategic:'var(--purple)',governance:'var(--teal)'};
+  const dimKeys=['external','operational','financial','strategic','governance'];
   document.querySelector('#riskDimensionTable tbody').innerHTML=data.sort((a,b)=>a.riskScore-b.riskScore).map(c=>{
     const dims=c.riskDimensions;
     return `<tr class="${c.riskLevel==='high'?'row-red':c.riskLevel==='medium'?'row-yellow':''}">
       <td style="color:var(--text-primary);font-weight:500">${c.name}</td>
-      ${['external','operational','financial','strategic','governance'].map(d=>{
+      ${dimKeys.map(d=>{
         const v=dims[d],cl=v>=75?'var(--green)':v>=60?'var(--amber)':'var(--red)';
-        return `<td><span class="mini-bar-track"><span class="mini-bar-fill" style="width:${v}%;background:${dimColors[d]}"></span></span><span class="num" style="color:${cl}">${v}</span></td>`;
+        const activeCount=c.riskFactors.filter(f=>f.dimension===dimNames[d]&&f.status==='active').length;
+        const totalCount=c.riskFactors.filter(f=>f.dimension===dimNames[d]).length;
+        return `<td title="${dimNames[d]}: ${totalCount}个因子, ${activeCount}个活跃"><span class="mini-bar-track"><span class="mini-bar-fill" style="width:${v}%;background:${dimColors[d]}"></span></span><span class="num" style="color:${cl}">${v}</span><span style="font-size:var(--fs-xs);color:var(--text-muted)"> (${activeCount})</span></td>`;
       }).join('')}
       <td class="num" style="font-weight:700;color:${c.riskScore>=75?'var(--green)':c.riskScore>=60?'var(--amber)':'var(--red)'}">${c.riskScore}</td>
       <td><span class="risk-dot ${c.riskLevel==='high'?'red':c.riskLevel==='medium'?'yellow':'green'}"></span></td>
     </tr>`;
   }).join('');
 
-  // --- Risk Factors Table ---
+  // --- Risk Factors Table (filterable) ---
   const allFactors=data.flatMap(c=>c.riskFactors.map(f=>({...f,company:c.name})));
-  const activeFactors=allFactors.filter(f=>f.status==='active');
-  document.getElementById('riskFactorBadge').textContent=activeFactors.length+' 项活跃';
-  document.querySelector('#riskFactorTable tbody').innerHTML=allFactors.sort((a,b)=>(a.severity==='high'?-1:a.severity==='medium'?0:1)-(b.severity==='high'?-1:b.severity==='medium'?0:1)).map(f=>{
+  const activeCount=allFactors.filter(f=>f.status==='active').length;
+  document.getElementById('riskFactorBadge').textContent=activeCount+' 项活跃';
+
+  // Populate company filter dropdown
+  const coSel=document.getElementById('filterCompany');
+  coSel.innerHTML='<option value="all">全部公司</option>'+data.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+
+  // Render filtered factors
+  function renderFilteredFactors(){
+    const fCo=document.getElementById('filterCompany').value;
+    const fDim=document.getElementById('filterDimension').value;
+    const fSev=document.getElementById('filterSeverity').value;
+    const fSt=document.getElementById('filterStatus').value;
+    const filtered=allFactors.filter(f=>
+      (fCo==='all'||f.company===fCo)&&
+      (fDim==='all'||f.dimension===fDim)&&
+      (fSev==='all'||f.severity===fSev)&&
+      (fSt==='all'||f.status===fSt)
+    );
+    document.getElementById('filterCount').textContent='显示 '+filtered.length+'/'+allFactors.length+' 条';
     const sevColors={high:'var(--red)',medium:'var(--amber)',low:'var(--green)'};
     const sevLabels={high:'🔴 高',medium:'🟡 中',low:'🟢 低'};
     const stColors={active:'var(--red)',monitoring:'var(--amber)',mitigated:'var(--green)'};
     const stLabels={active:'进行中',monitoring:'监控中',mitigated:'已缓解'};
-    return `<tr class="${f.severity==='high'?'row-red':f.severity==='medium'?'row-yellow':''}">
+    document.querySelector('#riskFactorTable tbody').innerHTML=filtered.sort((a,b)=>(a.severity==='high'?-1:a.severity==='medium'?0:1)-(b.severity==='high'?-1:b.severity==='medium'?0:1)).map(f=>`<tr class="${f.severity==='high'?'row-red':f.severity==='medium'?'row-yellow':''}">
       <td style="color:var(--text-primary);font-weight:500">${f.company}</td>
       <td>${f.dimension}</td><td>${f.subCategory}</td>
       <td style="color:${sevColors[f.severity]};font-weight:600">${sevLabels[f.severity]}</td>
       <td style="max-width:280px;white-space:normal;font-size:var(--fs-xs)">${f.description}</td>
       <td style="color:${stColors[f.status]}">${stLabels[f.status]}</td>
       <td>${f.owner}</td><td>${f.deadline}</td>
-    </tr>`;
-  }).join('');
+    </tr>`).join('');
+  }
+  renderFilteredFactors();
+  // Store for event binding
+  window._renderFilteredFactors=renderFilteredFactors;
 
-  // --- Leading signals radar (keep existing) ---
-  const sel=document.getElementById('radarCompanySelect');
-  sel.innerHTML=data.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  sel.value=selectedCompanyId;
-  renderRadarForCompany(data.find(c=>c.id===selectedCompanyId));
+  // --- Five Risk Profile Cards ---
+  renderRiskProfiles(data);
 
-  // --- Cash runway bar (keep existing) ---
-  const runwayData=data.sort((a,b)=>a.cashRunway-b.cashRunway);
-  createBarH('chartCashRunway',runwayData.map(c=>c.name),runwayData.map(c=>c.cashRunway),runwayData.map(c=>c.cashRunway<6?'#e74c3c':c.cashRunway<12?'#f0a030':'#2ecc71'),'月');
+}
 
-  // --- Burn chart (keep existing) ---
-  const burnSel=document.getElementById('burnCompanySelect');
-  burnSel.innerHTML=data.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  burnSel.value=selectedCompanyId;
-  renderBurnForCompany(data.find(c=>c.id===selectedCompanyId));
+function renderRiskProfiles(data){
+  const dimNames={external:'外部风险',operational:'运营风险',financial:'财务风险',strategic:'战略风险',governance:'治理风险'};
+  const dimColorsBG={external:'rgba(231,76,60,0.06)',operational:'rgba(240,160,48,0.05)',financial:'rgba(74,158,255,0.05)',strategic:'rgba(167,139,250,0.05)',governance:'rgba(45,212,191,0.05)'};
+  const dimBorders={external:'var(--red)',operational:'var(--amber)',financial:'var(--blue)',strategic:'var(--purple)',governance:'var(--teal)'};
+  const subLabels={
+    external:['政治环境','行业变化','友商竞争','法律法规','贸易政策'],
+    operational:['质量管理','团队稳定性','供应链','技术产品'],
+    financial:['资金流动性','运营效率','财务结构','造血能力'],
+    strategic:['技术变革','市场分析','战略转型','业务组合'],
+    governance:['治理结构','关键股东控制','关联交易','内控合规']
+  };
+  const dimKeys=['external','operational','financial','strategic','governance'];
+
+  let html='';
+  dimKeys.forEach(d=>{
+    // For each dimension, show a mini-table of all 15 companies with their factor-driven sub-indicators
+    const rows=data.sort((a,b)=>a.riskDimensions[d]-b.riskDimensions[d]).map(c=>{
+      // Extract unique sub-categories from this company's risk factors for this dimension
+      const dimFactors=c.riskFactors.filter(f=>f.dimension===dimNames[d]);
+      const subScores=[];
+      subLabels[d].forEach(sub=>{
+        const factor=dimFactors.find(f=>f.subCategory===sub);
+        if(factor){
+          const sevScore=factor.severity==='high'?25:factor.severity==='medium'?15:5;
+          const actualScore=factor.status==='active'?sevScore:sevScore*0.4;
+          subScores.push({label:sub,score:Math.round(Math.max(5,95-actualScore)),hasFactor:true,status:factor.status});
+        } else {
+          subScores.push({label:sub,score:'—',hasFactor:false,status:''});
+        }
+      });
+      return `<tr class="${c.riskLevel==='high'?'row-red':c.riskLevel==='medium'?'row-yellow':''}" style="font-size:var(--fs-xs)">
+        <td style="color:var(--text-primary);font-weight:500;min-width:80px">${c.name}</td>
+        <td class="num" style="min-width:40px;font-weight:700;color:${c.riskLevel==='high'?'var(--red)':c.riskLevel==='medium'?'var(--amber)':'var(--green)'}">${c.riskDimensions[d]}</td>
+        ${subScores.map(s=>`<td class="num" style="min-width:48px;color:${s.hasFactor?(s.status==='active'?(s.score<70?'var(--red)':s.score<85?'var(--amber)':'var(--green)'):'var(--text-muted)'):'var(--text-muted)'}">${s.hasFactor?s.score+'分':'—'}</td>`).join('')}
+      </tr>`;
+    }).join('');
+    const avgScore=Math.round(data.reduce((s,c)=>s+c.riskDimensions[d],0)/data.length);
+    const activeCount=data.reduce((s,c)=>s+c.riskFactors.filter(f=>f.dimension===dimNames[d]&&f.status==='active').length,0);
+    html+=`<div style="background:${dimColorsBG[d]};border:1px solid ${dimBorders[d]};border-radius:var(--r-md);padding:var(--s3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s2)">
+        <span style="font-weight:700;color:${dimBorders[d]};font-size:var(--fs-md)">${dimNames[d]}</span>
+        <span style="font-size:var(--fs-xs);color:var(--text-muted)">均值 ${avgScore}分 · ${activeCount}个活跃因子</span>
+      </div>
+      <table class="table-data" style="font-size:var(--fs-xs)"><thead><tr>
+        <th>公司</th><th>得分</th>${subLabels[d].map(s=>`<th>${s}</th>`).join('')}
+      </tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  });
+  document.getElementById('riskProfiles').innerHTML=html;
 }
 
 function renderRiskRadar(c){
@@ -949,27 +1047,6 @@ function renderRiskRadar(c){
     label:c.name,data:[dims.external,dims.operational,dims.financial,dims.strategic,dims.governance],
     backgroundColor:'rgba(240,160,48,0.12)',borderColor:'#f0a030',borderWidth:2,pointBackgroundColor:'#f0a030',pointRadius:4
   }]);
-}
-
-function renderRadarForCompany(c){
-  createRadarChart('chartRadar',['招聘活跃度','网络流量','GitHub活动','社交情绪','新闻情绪','专利申请'],[{
-    label:c.name,data:[c.hiringVelocity*4,c.webTrafficMoM+20,c.githubCommits/5,c.socialSentiment*50+50,c.newsSentimentScore*50+50,c.patentFilings*6],
-    backgroundColor:'rgba(74,158,255,0.15)',borderColor:'#4a9eff',borderWidth:2,pointBackgroundColor:'#4a9eff'
-  }]);
-}
-
-function renderBurnForCompany(c){
-  destroyChart('chartBurn');
-  const ctx=document.getElementById('chartBurn').getContext('2d');
-  const labels=['Q1','Q2','Q3','Q4','W1-4','W5-8','W9-13'];
-  const hist=c.quarterlyBurn;
-  const proj=[c.quarterlyBurn[3]*0.95,c.quarterlyBurn[3]*0.9,c.quarterlyBurn[3]*0.85].map(v=>Math.round(v));
-  const all=[...hist,...proj];
-  charts['chartBurn']=new Chart(ctx,{type:'line',data:{labels,datasets:[
-    {label:'实际消耗',data:[...hist,null,null,null],borderColor:'#f0a030',backgroundColor:'rgba(240,160,48,0.1)',fill:true,tension:0.3,borderWidth:2,pointRadius:4},
-    {label:'13周预测',data:[null,null,null,hist[3],...proj],borderColor:'#4a9eff',backgroundColor:'rgba(74,158,255,0.05)',fill:true,tension:0.3,borderWidth:2,borderDash:[5,5],pointRadius:3},
-    {label:'预警线',data:Array(7).fill(c.burnRate*1.5),borderColor:'#e74c3c',borderWidth:1,borderDash:[3,3],pointRadius:0,fill:false}
-  ]},options:opts({scales:{x:{grid:{color:'#1c2433'},ticks:{color:'#8b949e',font:{size:9}}},y:{grid:{color:'#1c2433'},ticks:{color:'#8b949e',font:{size:9}},title:{display:true,text:'万元/月',color:'#8b949e'}}}})});
 }
 
 // --- Section 3: Strategic Synergy ---
@@ -1256,16 +1333,6 @@ function bindEvents(){
     const c=portfolioData.find(x=>x.id===selectedCompanyId);
     if(c) renderRiskRadar(c);
   });
-  document.getElementById('radarCompanySelect').addEventListener('change',function(){
-    selectedCompanyId=this.value;
-    const c=portfolioData.find(x=>x.id===selectedCompanyId);
-    if(c) renderRadarForCompany(c);
-  });
-  document.getElementById('burnCompanySelect').addEventListener('change',function(){
-    selectedCompanyId=this.value;
-    const c=portfolioData.find(x=>x.id===selectedCompanyId);
-    if(c) renderBurnForCompany(c);
-  });
   document.getElementById('bscCompanySelect').addEventListener('change',function(){
     selectedCompanyId=this.value;
     const c=portfolioData.find(x=>x.id===selectedCompanyId);
@@ -1309,6 +1376,14 @@ function bindEvents(){
       this.classList.add('active');
       activeRecType=this.dataset.type;
       renderRecommendations();
+    });
+  });
+
+  // Risk factor filters
+  ['filterCompany','filterDimension','filterSeverity','filterStatus'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('change',function(){
+      if(window._renderFilteredFactors) window._renderFilteredFactors();
     });
   });
 

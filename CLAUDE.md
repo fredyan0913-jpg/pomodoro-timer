@@ -68,9 +68,9 @@ Rebuild with `Pomodoro.app/Contents/MacOS/launcher` as executable (+x).
 
 ## Overview
 
-Single-file HTML dashboard for a Corporate Venture Capital (CVC) post-investment management workflow. Built for a CVC team managing ~15 A-share listed portfolio companies under a simulated Huawei CVC context.
+Single-file HTML dashboard for a Corporate Venture Capital (CVC) post-investment management workflow. Built for a CVC team managing 15 A-share listed portfolio companies under a simulated DJI (大疆创新) CVC context.
 
-**File:** `post-investment-dashboard.html` (~1,340 lines, ~85 KB)
+**File:** `post-investment-dashboard.html` (~1,416 lines)
 
 **Subject:** CVC portfolio monitoring and actionable recommendations  
 **Audience:** Investment managers, risk committee, leadership  
@@ -92,11 +92,12 @@ open http://localhost:8765/post-investment-dashboard.html
 - **Pure single-file HTML** — zero build step, no framework, no backend
 - **CSS:** CSS custom properties (design tokens), Grid + Flexbox layout, 3 responsive breakpoints (1200/768/520px)
 - **Charts:** Chart.js 4.4.0 via CDN — bar, line, doughnut, radar, bubble, and mixed chart types
-- **JS:** ~750 lines in a single IIFE (`(function(){...})()`), organized by data → aggregation → rendering → events
-- **Data:** All mock data generated client-side via `generateMockData()` — 15 companies × ~100 fields each
-- **State:** Single global `portfolioData[]` array, `fundAgg{}` object, and `charts{}` instance registry
-- **Navigation:** Sticky top navbar with IntersectionObserver scroll-spy + inline `onclick` fallbacks
-- **Global API:** `window.AppNav.refresh()` and `window.AppNav.scrollToSection(id)` for external control
+- **JS:** ~950 lines in a single IIFE (`(function(){...})()`), organized by data → aggregation → safe-rendering → events. Each section render is wrapped in try-catch via `safeRender()`.
+- **Data:** Mock data generated client-side via `generateMockData()` — 15 companies × 100+ fields each. Financial metrics sourced from real 2024 annual reports (revenue, net profit, R&D intensity, market position).
+- **State:** `portfolioData[]`, `fundAgg{}`, `charts{}` instance registry, `recommendations{capital,noncapital}`, `selectedCompanyId`, `activeRole`, `activeRecType`
+- **Risk model:** Five-dimension scores *derived from* individual risk factors (not the reverse). Base 95 per dimension, minus severity-weighted deductions for active factors.
+- **Navigation:** Sticky top navbar with IntersectionObserver scroll-spy + inline `onclick` fallbacks on all critical buttons
+- **Global API:** `window.AppNav.refresh()`, `window.AppNav.scrollToSection(id)`, `window._renderFilteredFactors()`
 
 ## Five-Dimension Risk Framework
 
@@ -153,7 +154,7 @@ Visualized as a full-width horizontal bubble chart (X = maturity, Y = importance
 | 14 | 宝信软件 | 600845.SH | 工业软件 | B轮 | 12.7x |
 | 15 | 中科创达 | 300496.SZ | 智能汽车软件 | B轮 | 14.4x |
 
-**CVC Parent:** Huawei — 8 business units (消费者 · 企业 · 云计算 · 智能汽车 · 数字能源 · 半导体 · 工业互联网 · 医疗科技)
+**CVC Parent:** DJI 大疆创新 — 8 business units (消费无人机 · 行业应用 · 农业植保 · 手持影像 · 车载智驾 · 教育机器人 · 测绘GIS · 能源安防). BU engagement is sector-mapped (e.g., 宁德时代→车载智驾+能源安防, 海康威视→行业应用+测绘GIS).
 
 ## Design Token System
 
@@ -181,11 +182,9 @@ Animation:   Scan-line header, card stagger entrance, red alert pulse
 ### Section 2: 风险监控 (Risk Monitoring)
 - **Risk Radar:** `chartRiskRadar` — 5-dimension spider chart, per-company via dropdown
 - **Risk Overview:** `chartTrafficLightRisk` — donut + average risk score + weakest dimension
-- **Risk Dimension Table:** 15 companies × 5 dimensions + composite score, color-coded heatmap rows
-- **Risk Factors Table:** Active risk events with dimension, severity, status, owner, deadline
-- **Leading Signals Radar:** `chartRadar` — external signals (hiring, GitHub, web, social, news, patents)
-- **Cash Runway Bar:** `chartCashRunway` — horizontal bar, all companies, color-coded
-- **Burn Chart:** `chartBurn` — quarterly burn + 13-week forecast, per-company
+- **Risk Dimension Table:** 15 companies × 5 dimensions + composite score. Each cell shows `分数(活跃因子数)`. Hover reveals total/active factor counts. Scores *derived from* risk factors below.
+- **Risk Factors Table:** Full risk factor list with filter row (company × dimension × severity × status). Four dropdowns with AND logic + live count. Factors are the *source of truth* for dimension scores.
+- **Five Risk Profile Cards:** One expandable panel per risk dimension, showing all 15 companies' sub-indicator scores (e.g., 政治环境, 行业变化, 友商竞争 for 外部风险). Sub-scores computed from the same risk factors.
 
 ### Section 3: 战略协同 (Strategic Synergy)
 - **BU Engagement Heatmap:** Custom CSS grid — 15 companies × 8 parent BUs, engagement level 0–5
@@ -254,6 +253,8 @@ Animation:   Scan-line header, card stagger entrance, red alert pulse
 6. **Cache-disabled** — meta tags prevent browser caching during active development
 7. **Bloomberg aesthetic** — amber-on-dark, tabular figures, no gradients, no large shadows, scan-line header effect
 8. **CVC differentiation** — BU engagement heatmap and strategic importance axis distinguish this from a generic VC dashboard
+9. **Risk score derived from factors** — dimension scores (0–100) are calculated from individual risk factors, not the reverse. Each active factor deducts points from a base of 95. The dimension table and risk factors table are traceably linked.
+10. **Filterable risk factors** — the risk factors table has 4 dropdown filters (company, dimension, severity, status) operating with AND logic. This is the practical entry point for drill-down analysis.
 
 ## Industry Research Sources
 
@@ -266,13 +267,10 @@ Animation:   Scan-line header, card stagger entrance, red alert pulse
 - Visible.vc / Vestberry portfolio monitoring best practices
 - 中国 VC 行业 ABCDE 五级分类标准
 
-## Future Enhancement Areas
+## Current Limitations & Future Work
 
-- [ ] Persistent data storage (localStorage / IndexedDB)
-- [ ] LP reporting view
-- [ ] Fund-level cash flow waterfall
-- [ ] Scenario modeling (base / upside / downside)
-- [ ] Automated data ingestion from public APIs (stock prices, news)
-- [ ] Export to PDF / Excel
-- [ ] Dark/light theme toggle
-- [ ] Multi-fund support
+- Financial metrics are static (single-year 2024 data); future should pull from real-time APIs or multi-year filings
+- BU engagement data is simulated; real CVC would integrate CRM/partnership tracking
+- Exit DPI projection is mock; needs actual LP distribution schedules
+- No persistent storage — data regenerates on every refresh
+- No export capability (PDF/Excel for IC meetings)
