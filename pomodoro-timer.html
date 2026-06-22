@@ -6,16 +6,17 @@
 <title>🍅 番茄时钟</title>
 <style>
   :root {
-    --bg: #1a1a2e;
-    --card: #16213e;
-    --primary: #e94560;
-    --secondary: #0f3460;
-    --text: #eee;
-    --muted: #a0a0b0;
-    --work: #e94560;
-    --break: #4ecca3;
-    --long-break: #4e9fca;
-    --ring-bg: rgba(233, 69, 96, 0.08);
+    --bg: #FDF5E6;
+    --card: #FFF8F0;
+    --primary: #C27A5A;
+    --secondary: #F0E0D0;
+    --text: #4A3028;
+    --muted: #A08070;
+    --work: #C27A5A;
+    --break: #8FA88F;
+    --long-break: #7A9EB5;
+    --ring-bg: rgba(194, 122, 90, 0.12);
+    --border: #E8D5C4;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,6 +46,7 @@
     gap: 6px;
     margin-bottom: 2.5rem;
     background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 5px;
   }
@@ -67,9 +69,9 @@
     background: var(--secondary);
     color: var(--text);
   }
-  .mode-tab.work.active   { background: var(--work); }
-  .mode-tab.break.active  { background: var(--break); color: #111; }
-  .mode-tab.long.active   { background: var(--long-break); }
+  .mode-tab.work.active   { background: var(--work); color: #fff; }
+  .mode-tab.break.active  { background: var(--break); color: #fff; }
+  .mode-tab.long.active   { background: var(--long-break); color: #fff; }
 
   .timer-ring-wrapper {
     position: relative;
@@ -153,16 +155,16 @@
     width: 72px;
     height: 72px;
     font-size: 1.8rem;
-    box-shadow: 0 6px 24px rgba(233, 69, 96, 0.35);
+    box-shadow: 0 6px 24px rgba(194, 122, 90, 0.35);
   }
-  .btn-play:hover { box-shadow: 0 8px 32px rgba(233, 69, 96, 0.5); transform: translateY(-1px); }
+  .btn-play:hover { box-shadow: 0 8px 32px rgba(194, 122, 90, 0.5); transform: translateY(-1px); }
 
   .btn-secondary {
     background: var(--card);
     color: var(--text);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-  .btn-secondary:hover { background: #1e2a4a; }
+  .btn-secondary:hover { background: var(--border); }
 
   .stats {
     display: flex;
@@ -198,7 +200,7 @@
     font-family: inherit;
     transition: background 0.2s;
   }
-  .sound-toggle:hover { background: #1e2a4a; }
+  .sound-toggle:hover { background: var(--border); }
   .sound-toggle.on { color: var(--break); }
 
   @media (max-width: 440px) {
@@ -254,9 +256,9 @@
 
 <script>
   const MODES = {
-    work:      { label: '🍅 专注 25 分钟', minutes: 25, color: '#e94560', ringClass: '',           sessionLabel: '番茄 #{}' },
-    break:     { label: '☕ 短休 5 分钟',  minutes: 5,  color: '#4ecca3', ringClass: 'break',       sessionLabel: '短休息' },
-    long:      { label: '🌴 长休 15 分钟', minutes: 15, color: '#4e9fca', ringClass: 'long-break',  sessionLabel: '长休息' },
+    work:      { label: '🍅 专注 25 分钟', minutes: 25, color: '#C27A5A', ringClass: '',           sessionLabel: '番茄 #{}' },
+    break:     { label: '☕ 短休 5 分钟',  minutes: 5,  color: '#8FA88F', ringClass: 'break',       sessionLabel: '短休息' },
+    long:      { label: '🌴 长休 15 分钟', minutes: 15, color: '#7A9EB5', ringClass: 'long-break',  sessionLabel: '长休息' },
   };
 
   const CIRCUMFERENCE = 2 * Math.PI * 130;
